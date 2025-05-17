@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import axios from "axios";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export default function InviteUsersPage() {
@@ -110,6 +111,27 @@ export default function InviteUsersPage() {
 
   return (
     <div className="max-w-4xl mx-auto py-10 px-4">
+      <div className="w-full flex justify-start mb-8">
+        <Link
+          href="/chart"
+          className="inline-flex items-center text-gray-600 hover:text-black font-medium group transition-colors"
+        >
+          <svg
+            className="w-5 h-5 mr-1 group-hover:-translate-x-1 transition-transform"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2.2}
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+          Back to Organization Chart
+        </Link>
+      </div>
       <h1 className="text-3xl font-bold mb-8 text-center text-gray-800">
         Invite Users and Get Started
       </h1>

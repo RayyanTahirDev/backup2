@@ -257,7 +257,10 @@ export default function ChartPage() {
                   (subfuncCount - 1) * subfuncBoxGap;
 
                 return (
-                  <div key={department._id} className="flex flex-col items-center">
+                  <div
+                    key={department._id}
+                    className="flex flex-col items-center"
+                  >
                     {/* Department Box */}
                     <div
                       className="relative bg-white rounded-xl shadow border border-gray-200 px-7 py-6 flex flex-col items-center mb-6"
@@ -278,8 +281,10 @@ export default function ChartPage() {
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="text-lg font-bold">
-                            {department.hodName}
+                          <div className="text-lg font-bold hover:underline cursor-pointer">
+                            <Link href={`/departments/${department._id}`}>
+                              {department.hodName}
+                            </Link>
                           </div>
                           <div className="text-base text-gray-900 font-medium">
                             {department.role}
@@ -305,7 +310,9 @@ export default function ChartPage() {
                           className="flex items-center"
                         >
                           <ChevronIcon up={!deptCollapsed[department._id]} />
-                          {deptCollapsed[department._id] ? "Expand" : "Collapse"}
+                          {deptCollapsed[department._id]
+                            ? "Expand"
+                            : "Collapse"}
                         </Button>
                         <Link href="/departments">
                           <Button size="sm" variant="outline">
@@ -319,7 +326,10 @@ export default function ChartPage() {
                     {subfuncCount > 0 && !deptCollapsed[department._id] && (
                       <div
                         className="flex flex-row gap-4"
-                        style={{ minWidth: subfuncsWidth, justifyContent: "center" }}
+                        style={{
+                          minWidth: subfuncsWidth,
+                          justifyContent: "center",
+                        }}
                       >
                         {department.subfunctions.map((sf, idx) => {
                           // Find team lead and team members for this subfunction
@@ -399,9 +409,11 @@ export default function ChartPage() {
                                     marginBottom: teamMembers.length ? 16 : 0,
                                   }}
                                 >
-                                  <span className="font-bold text-black">
-                                    {teamLead.name}
-                                  </span>
+                                  <Link href={`/teammembers/${teamLead._id}`}>
+                                    <span className="font-bold text-black hover:underline cursor-pointer">
+                                      {teamLead.name}
+                                    </span>
+                                  </Link>
                                   <span className="text-xs text-gray-700">
                                     Team Lead
                                   </span>
@@ -419,16 +431,18 @@ export default function ChartPage() {
                                 >
                                   {teamMembers.map((_, i) => {
                                     const x =
-                                      (teamMemberBoxWidth + teamMemberBoxGap) * i +
+                                      (teamMemberBoxWidth + teamMemberBoxGap) *
+                                        i +
                                       teamMemberBoxWidth / 2;
                                     return (
                                       <line
                                         key={i}
                                         x1={
                                           (teamMembers.length *
-                                            (teamMemberBoxWidth + teamMemberBoxGap) -
+                                            (teamMemberBoxWidth +
+                                              teamMemberBoxGap) -
                                             teamMemberBoxGap) /
-                                            2
+                                          2
                                         }
                                         y1={0}
                                         x2={x}
@@ -453,9 +467,11 @@ export default function ChartPage() {
                                         minHeight: teamMemberBoxHeight,
                                       }}
                                     >
-                                      <span className="font-semibold text-black">
-                                        {tm.name}
-                                      </span>
+                                      <Link href={`/teammembers/${tm._id}`}>
+                                        <span className="text-gray-900 hover:underline cursor-pointer">
+                                          {tm.name}
+                                        </span>
+                                      </Link>
                                       <span className="text-xs text-gray-700">
                                         Team Member
                                       </span>

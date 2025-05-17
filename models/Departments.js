@@ -27,7 +27,7 @@ const departmentSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    subfunctions: [subfunctionSchema], // Array of subfunctions
+    subfunctions: [subfunctionSchema],
   },
   { timestamps: true }
 );
