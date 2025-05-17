@@ -175,7 +175,7 @@ export default function ChartPage() {
               <div className="flex-1 min-w-0">
                 <div className="text-lg font-bold">{organization.ceoName}</div>
                 <div className="text-base text-gray-900 font-medium">CEO</div>
-                <div className="text-sm text-gray-400">Executive</div>
+                <div className="text-sm text-gray-400">{organization.industry}</div>
                 <div className="text-sm text-gray-700">
                   {organization.email}
                 </div>

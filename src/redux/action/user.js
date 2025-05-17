@@ -1,6 +1,7 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 import {
+  loadingStart,
   btnLoadingStart,
   registerSuccess,
   registerFail,
@@ -45,13 +46,22 @@ export const getUser = () => async (dispatch) => {
   try {
     dispatch(loadingStart());
 
-    const { data } = await axios.get("/api/user/me");
+    const token = Cookies.get("token");
+    if (!token) {
+      dispatch(getUserFail("No token found"));
+      return;
+    }
+
+    const { data } = await axios.get("/api/user/myprofile", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
     dispatch(getUserSuccess(data));
   } catch (error) {
     dispatch(getUserFail(error.response?.data?.message || error.message));
   }
 };
+
 
 export const logoutUser = () => (dispatch) => {
   Cookies.remove("token", { path: "/" });

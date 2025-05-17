@@ -13,6 +13,9 @@ const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
+    loadingStart: (state) => {
+      state.loading = true;
+    },
     btnLoadingStart: (state) => {
       state.btnLoading = true;
       state.error = null;

@@ -1,3 +1,4 @@
+import AuthHydrator from "./AuthHydrator";
 import "./globals.css";
 import ProviderRedux from "./provider";
 
@@ -10,7 +11,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <ProviderRedux>{children}</ProviderRedux>
+        <ProviderRedux>
+          <AuthHydrator />
+          {children}
+        </ProviderRedux>
       </body>
     </html>
   );
