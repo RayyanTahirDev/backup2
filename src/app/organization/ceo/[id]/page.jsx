@@ -6,16 +6,16 @@ import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
-export default function DepartmentPage({ params }) {
+export default function CeoPage({ params }) {
   const { id } = React.use(params);
 
   const router = useRouter();
-  const [department, setDepartment] = useState(null);
+  const [ceo, setCeo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchDepartment = async () => {
+    const fetchCeo = async () => {
       setLoading(true);
       setError(null);
       try {
@@ -24,24 +24,22 @@ export default function DepartmentPage({ params }) {
           router.push("/login");
           return;
         }
-        const res = await fetch(`/api/departments/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        const res = await fetch(`/api/organization/ceo?id=${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) {
           const data = await res.json();
-          throw new Error(data.message || "Failed to fetch department");
+          throw new Error(data.message || "Failed to fetch CEO");
         }
         const data = await res.json();
-        setDepartment(data);
+        setCeo(data);
       } catch (err) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
-    if (id) fetchDepartment();
+    if (id) fetchCeo();
   }, [id, router]);
 
   if (loading)
@@ -56,16 +54,15 @@ export default function DepartmentPage({ params }) {
         Error: {error}
       </div>
     );
-  if (!department)
+  if (!ceo)
     return (
       <div className="flex items-center justify-center h-[60vh]">
-        No department found.
+        No CEO found.
       </div>
     );
 
   return (
     <div className="min-h-screen w-full bg-white text-black px-4 py-10">
-      {/* Back link pinned to the extreme left */}
       <div className="w-full flex justify-start mb-8">
         <Link
           href="/chart"
@@ -87,38 +84,16 @@ export default function DepartmentPage({ params }) {
           Back to Organization Chart
         </Link>
       </div>
-
       <div className="max-w-2xl mx-auto">
         <h1 className="text-4xl font-extrabold mb-2 tracking-tight">
-          {department.hodName}
+          {ceo.name}
         </h1>
-        <div className="text-xl font-semibold text-gray-700 mb-6">
-          {department.role}
-        </div>
+        <div className="text-xl font-semibold text-gray-700 mb-6">CEO</div>
         <div className="space-y-0.5 divide-y divide-gray-200">
-          <InfoRow label="Email" value={department.hodEmail} />
-          <InfoRow label="Reports To" value="CEO" />
-          <InfoRow
-            label="Organization"
-            value={department.organization?.name || "N/A"}
-          />
-          <InfoRow label="Department" value={department.departmentName} />
-          <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4 py-3">
-            <span className="w-40 text-gray-500 font-medium">
-              Subfunctions:
-            </span>
-            <span className="text-black text-base">
-              {department.subfunctions && department.subfunctions.length > 0 ? (
-                <ul className="list-disc ml-6">
-                  {department.subfunctions.map((sf, idx) => (
-                    <li key={idx}>{sf.name}</li>
-                  ))}
-                </ul>
-              ) : (
-                "None"
-              )}
-            </span>
-          </div>
+          <InfoRow label="Email" value={ceo.email} />
+          <InfoRow label="Report To" value="-" />
+          <InfoRow label="Organization" value={ceo.organization} />
+          <InfoRow label="Industry" value={ceo.industry} />
         </div>
       </div>
     </div>

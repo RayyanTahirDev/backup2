@@ -146,9 +146,11 @@ export default function ChartPage() {
 
       {/* Organization Name in black */}
       {organization && (
-        <div className="text-3xl font-bold text-black mb-2">
-          {organization.name}
-        </div>
+        <Link href={`/organization/${organization._id}`}>
+          <span className="text-3xl font-bold text-black hover:underline cursor-pointer">
+            {organization.name}
+          </span>
+        </Link>
       )}
 
       {organization ? (
@@ -173,9 +175,15 @@ export default function ChartPage() {
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="text-lg font-bold">{organization.ceoName}</div>
+                <div className="text-lg font-bold hover:underline cursor-pointer">
+                  <Link href={`/organization/ceo/${organization._id}`}>
+                    {organization.ceoName}
+                  </Link>
+                </div>
                 <div className="text-base text-gray-900 font-medium">CEO</div>
-                <div className="text-sm text-gray-400">{organization.industry}</div>
+                <div className="text-sm text-gray-400">
+                  {organization.industry}
+                </div>
                 <div className="text-sm text-gray-700">
                   {organization.email}
                 </div>
@@ -282,7 +290,7 @@ export default function ChartPage() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="text-lg font-bold hover:underline cursor-pointer">
-                            <Link href={`/departments/${department._id}`}>
+                            <Link href={`/departments/hod/${department._id}`}>
                               {department.hodName}
                             </Link>
                           </div>
