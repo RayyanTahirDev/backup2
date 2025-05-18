@@ -13,6 +13,7 @@ const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [cvFile, setCvFile] = useState(null);
   const [localError, setLocalError] = useState("");
 
   const { isAuth, btnLoading, error } = useSelector((state) => state.user);
@@ -23,15 +24,24 @@ const Signup = () => {
   const submitHandler = (e) => {
     e.preventDefault();
     setLocalError("");
+
     if (password !== confirmPassword) {
       setLocalError("Passwords do not match.");
       return;
     }
+
+    if (!cvFile) {
+      setLocalError("Please upload your CV.");
+      return;
+    }
+
     const formdata = new FormData();
     formdata.append("name", name);
     formdata.append("email", email);
     formdata.append("password", password);
     formdata.append("confirmPassword", confirmPassword);
+    formdata.append("cv", cvFile);
+
     dispatch(registerUser(formdata));
   };
 
@@ -128,6 +138,24 @@ const Signup = () => {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 minLength={8}
+                required
+                className="w-full mb-2"
+              />
+            </div>
+            <div>
+              <Label
+                htmlFor="cv"
+                className="mb-1 block text-sm font-medium"
+                style={{ fontFamily: "var(--font-geist-sans)" }}
+              >
+                Upload CV
+              </Label>
+              <input
+                id="cv"
+                name="cv"
+                type="file"
+                accept=".pdf,.doc,.docx"
+                onChange={(e) => setCvFile(e.target.files[0])}
                 required
                 className="w-full mb-2"
               />

@@ -1,6 +1,7 @@
 import { connectDb } from "@/connectDb";
 import { NextResponse } from "next/server";
 import { User } from "../../../../../models/User";
+import uploadFile from "../../../../../middlewares/upload";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
@@ -13,6 +14,7 @@ export async function POST(request) {
     const email = formdata.get("email");
     const password = formdata.get("password");
     const confirmPassword = formdata.get("confirmPassword");
+    const cv = formdata.get("cv");
 
     if (!name || !email || !password || !confirmPassword) {
       return NextResponse.json(
@@ -36,12 +38,19 @@ export async function POST(request) {
       );
     }
 
+    let cvFile = "";
+
+    if (cv) {
+      cvFile = await uploadFile(cv);
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create({
       name,
       email,
       password: hashedPassword,
+      cv: cvFile.url,
     });
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SEC, {
