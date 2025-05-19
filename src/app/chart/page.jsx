@@ -6,33 +6,12 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getOrganization } from "@/redux/action/org";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
+import { ChevronDown, ChevronUp, Plus, User, FolderTree, Users, RotateCcw } from "lucide-react";
 import Cookies from "js-cookie";
 import { logoutSuccess } from "@/redux/reducer/userReducer";
 import axios from "axios";
-
-function ChevronIcon({ up }) {
-  return up ? (
-    <svg
-      className="w-4 h-4 mr-1"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      viewBox="0 0 24 24"
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
-    </svg>
-  ) : (
-    <svg
-      className="w-4 h-4 mr-1"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      viewBox="0 0 24 24"
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-    </svg>
-  );
-}
 
 export default function ChartPage() {
   const dispatch = useDispatch();
@@ -104,404 +83,325 @@ export default function ChartPage() {
     router.push("/login");
   };
 
+  const getInitials = (name) => {
+    return name
+      .split(" ")
+      .map((part) => part.charAt(0))
+      .join("")
+      .toUpperCase();
+  };
+
   if (!isAuth) return null;
 
-  const orgBoxWidth = 340;
-  const deptBoxWidth = 340;
-  const deptBoxGap = 32;
-  const subfuncBoxWidth = 180;
-  const subfuncBoxGap = 16;
-  const teamLeadBoxWidth = 180;
-  const teamLeadBoxHeight = 60;
-  const teamMemberBoxWidth = 140;
-  const teamMemberBoxHeight = 50;
-  const teamMemberBoxGap = 12;
-
-  const totalDeptWidth =
-    departments.length * deptBoxWidth + (departments.length - 1) * deptBoxGap;
-  const svgWidth = Math.max(orgBoxWidth, totalDeptWidth);
-
   return (
-    <div className="min-h-screen bg-white p-6 flex flex-col items-center">
-      <header className="flex justify-between items-center max-w-5xl w-full mb-6">
-        <h1 className="text-2xl font-bold">Organization Chart</h1>
-        <div className="flex items-center gap-3">
-          {!organization && (
-            <Link href="/organization">
-              <Button variant="outline" size="sm">
-                Create New Chart
-              </Button>
-            </Link>
-          )}
+    <div className="w-full">
+      <div className="w-full max-w-7xl my-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h1 className="text-2xl sm:text-3xl font-bold px-8 ml-50">Organizational Chart</h1>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            onClick={() => setCollapsed(!collapsed)}
+            variant="outline"
+            className="flex items-center gap-2"
+            size="sm"
+          >
+            {collapsed ? (
+              <>
+                <FolderTree className="h-4 w-4" />
+                <span className="hidden sm:inline">Expand All</span>
+              </>
+            ) : (
+              <>
+                <Users className="h-4 w-4" />
+                <span className="hidden sm:inline">Collapse All</span>
+              </>
+            )}
+          </Button>
           <Link href="/invite">
-            <Button variant="outline" size="sm">
-              Add Team Member
+            <Button variant="outline" className="flex items-center gap-2" size="sm">
+              <Plus className="h-4 w-4" />
+              <span className="hidden sm:inline">Add Team Member</span>
             </Button>
           </Link>
           <Button variant="destructive" size="sm" onClick={logoutHandler}>
             Logout
           </Button>
         </div>
-      </header>
-
-      {/* Organization Name in black */}
-      {organization && (
-        <Link href={`/organization/${organization._id}`}>
-          <span className="text-3xl font-bold text-black hover:underline cursor-pointer">
-            {organization.name}
-          </span>
-        </Link>
-      )}
+      </div>
 
       {organization ? (
         <div className="flex flex-col items-center w-full">
-          {/* Organization Box */}
-          <div
-            className="relative mx-auto bg-white rounded-xl shadow border border-gray-200 px-7 py-6 flex flex-col items-center"
-            style={{ minWidth: orgBoxWidth, maxWidth: orgBoxWidth }}
-          >
-            <div className="flex items-center w-full mb-2">
-              <div className="flex-shrink-0 mr-4">
-                {organization.ceoPic ? (
-                  <img
-                    src={organization.ceoPic}
-                    alt={`${organization.ceoName} Picture`}
-                    className="w-12 h-12 rounded-full object-cover border border-gray-300"
-                  />
-                ) : (
-                  <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 text-sm">
-                    <span>No Image</span>
+          {/* Organization (CEO) Card */}
+          <div className="flex flex-col items-center">
+            <Card className="w-64 sm:w-72">
+              <CardHeader className="py-4 pb-2">
+                <Button
+                  variant="ghost"
+                  className="p-0 h-auto w-full flex justify-between items-center mb-2 text-left"
+                  onClick={() => router.push(`/organization/ceo/${organization._id}`)}
+                >
+                  <div className="flex items-center gap-2">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={organization.ceoPic} />
+                      <AvatarFallback>{getInitials(organization.ceoName)}</AvatarFallback>
+                    </Avatar>
+                    <CardTitle className="text-sm sm:text-base font-medium">
+                      {organization.ceoName}
+                    </CardTitle>
                   </div>
-                )}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-lg font-bold hover:underline cursor-pointer">
-                  <Link href={`/organization/ceo/${organization._id}`}>
-                    {organization.ceoName}
-                  </Link>
-                </div>
-                <div className="text-base text-gray-900 font-medium">CEO</div>
-                <div className="text-sm text-gray-400">
-                  {organization.industry}
-                </div>
-                <div className="text-sm text-gray-700">
-                  {organization.email}
-                </div>
-              </div>
-            </div>
-            <div className="flex w-full justify-between mt-4">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => setCollapsed((c) => !c)}
-                className="flex items-center"
-              >
-                <ChevronIcon up={!collapsed} />
-                {collapsed ? "Expand" : "Collapse"}
-              </Button>
-              <Link href="/departments">
-                <Button size="sm" variant="outline">
-                  + Add
+                  <User size={16} className="text-muted-foreground" />
                 </Button>
-              </Link>
-            </div>
+              </CardHeader>
+              <CardContent className="pt-0 pb-2">
+                <div className="space-y-1">
+                  <p className="text-xs sm:text-sm font-medium">CEO</p>
+                  <p className="text-xs text-muted-foreground">{organization.industry}</p>
+                  <p className="text-xs truncate">{organization.email}</p>
+                </div>
+              </CardContent>
+              <CardFooter className="flex justify-between pt-0 pb-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-xs h-7 sm:h-8"
+                  onClick={() => setCollapsed(!collapsed)}
+                >
+                  {collapsed ? (
+                    <>
+                      <ChevronDown className="h-3.5 w-3.5 mr-1" />
+                      <span className="hidden sm:inline">Expand</span>
+                    </>
+                  ) : (
+                    <>
+                      <ChevronUp className="h-3.5 w-3.5 mr-1" />
+                      <span className="hidden sm:inline">Collapse</span>
+                    </>
+                  )}
+                </Button>
+                <Link href="/departments">
+                  <Button variant="secondary" size="sm" className="text-xs h-7 sm:h-8">
+                    <Plus className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline ml-1">Add</span>
+                  </Button>
+                </Link>
+              </CardFooter>
+            </Card>
+
+            {/* Vertical line from CEO to departments */}
+            {!collapsed && departments.length > 0 && (
+              <div className="w-0.5 h-8 bg-border/70" />
+            )}
           </div>
 
-          {/* SVG lines from org to departments */}
+          {/* Departments */}
           {!collapsed && departments.length > 0 && (
-            <svg
-              width={svgWidth}
-              height="54"
-              className="block mx-auto"
-              style={{ marginTop: 0, marginBottom: -12 }}
-            >
-              <line
-                x1={svgWidth / 2}
-                y1={0}
-                x2={svgWidth / 2}
-                y2={24}
-                stroke="#e5e7eb"
-                strokeWidth="2"
-              />
-              <line
-                x1={svgWidth / 2 - totalDeptWidth / 2 + deptBoxWidth / 2}
-                y1={24}
-                x2={svgWidth / 2 + totalDeptWidth / 2 - deptBoxWidth / 2}
-                y2={24}
-                stroke="#e5e7eb"
-                strokeWidth="2"
-              />
-              {departments.map((_, idx) => {
-                const x =
-                  svgWidth / 2 -
-                  totalDeptWidth / 2 +
-                  deptBoxWidth / 2 +
-                  idx * (deptBoxWidth + deptBoxGap);
-                return (
-                  <line
-                    key={idx}
-                    x1={x}
-                    y1={24}
-                    x2={x}
-                    y2={54}
-                    stroke="#e5e7eb"
-                    strokeWidth="2"
-                  />
-                );
-              })}
-            </svg>
-          )}
+            <div className="flex flex-wrap justify-center gap-4 md:gap-8 relative px-2 md:px-0">
+              {departments.map((department) => (
+                <div key={department._id} className="flex flex-col items-center">
+                  {/* Vertical line from CEO to department */}
+                  <div className="w-0.5 h-5 bg-border/70" />
 
-          {/* Departments and Subfunctions */}
-          {!collapsed && departments.length > 0 && (
-            <div
-              className="flex flex-row justify-center items-start gap-8 mt-0"
-              style={{ minWidth: svgWidth }}
-            >
-              {departments.map((department, deptIdx) => {
-                const subfuncCount = department.subfunctions?.length || 0;
-                const subfuncsWidth =
-                  subfuncCount * subfuncBoxWidth +
-                  (subfuncCount - 1) * subfuncBoxGap;
-
-                return (
-                  <div
-                    key={department._id}
-                    className="flex flex-col items-center"
-                  >
-                    {/* Department Box */}
-                    <div
-                      className="relative bg-white rounded-xl shadow border border-gray-200 px-7 py-6 flex flex-col items-center mb-6"
-                      style={{ minWidth: deptBoxWidth, maxWidth: deptBoxWidth }}
-                    >
-                      <div className="flex items-center w-full mb-2">
-                        <div className="flex-shrink-0 mr-4">
-                          {department.hodPic ? (
-                            <img
-                              src={department.hodPic}
-                              alt={`${department.hodName} Picture`}
-                              className="w-12 h-12 rounded-full object-cover border border-gray-300"
-                            />
-                          ) : (
-                            <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 text-sm">
-                              <span>No Image</span>
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="text-lg font-bold hover:underline cursor-pointer">
-                            <Link href={`/departments/hod/${department._id}`}>
-                              {department.hodName}
-                            </Link>
-                          </div>
-                          <div className="text-base text-gray-900 font-medium">
-                            {department.role}
-                          </div>
-                          <div className="text-sm text-gray-400">
-                            {department.departmentName}
-                          </div>
-                          <div className="text-sm text-gray-700">
-                            {department.hodEmail}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex w-full justify-between mt-4">
+                  {/* Department Card */}
+                  <div className="flex flex-col items-center">
+                    <Card className="w-64 sm:w-72">
+                      <CardHeader className="py-4 pb-2">
                         <Button
-                          size="sm"
+                          variant="ghost"
+                          className="p-0 h-auto w-full flex justify-between items-center mb-2 text-left"
+                          onClick={() => router.push(`/departments/hod/${department._id}`)}
+                        >
+                          <div className="flex items-center gap-2">
+                            <Avatar className="h-8 w-8">
+                              <AvatarImage src={department.hodPic} />
+                              <AvatarFallback>{getInitials(department.hodName)}</AvatarFallback>
+                            </Avatar>
+                            <CardTitle className="text-sm sm:text-base font-medium">
+                              {department.hodName}
+                            </CardTitle>
+                          </div>
+                          <User size={16} className="text-muted-foreground" />
+                        </Button>
+                      </CardHeader>
+                      <CardContent className="pt-0 pb-2">
+                        <div className="space-y-1">
+                          <p className="text-xs sm:text-sm font-medium">{department.role}</p>
+                          <p className="text-xs text-muted-foreground">{department.departmentName}</p>
+                          <p className="text-xs truncate">{department.hodEmail}</p>
+                        </div>
+                      </CardContent>
+                      <CardFooter className="flex justify-between pt-0 pb-3">
+                        <Button
                           variant="outline"
+                          size="sm"
+                          className="text-xs h-7 sm:h-8"
                           onClick={() =>
                             setDeptCollapsed((prev) => ({
                               ...prev,
                               [department._id]: !prev[department._id],
                             }))
                           }
-                          className="flex items-center"
                         >
-                          <ChevronIcon up={!deptCollapsed[department._id]} />
-                          {deptCollapsed[department._id]
-                            ? "Expand"
-                            : "Collapse"}
+                          {deptCollapsed[department._id] ? (
+                            <>
+                              <ChevronDown className="h-3.5 w-3.5 mr-1" />
+                              <span className="hidden sm:inline">Expand</span>
+                            </>
+                          ) : (
+                            <>
+                              <ChevronUp className="h-3.5 w-3.5 mr-1" />
+                              <span className="hidden sm:inline">Collapse</span>
+                            </>
+                          )}
                         </Button>
                         <Link href="/departments">
-                          <Button size="sm" variant="outline">
-                            + Add
+                          <Button variant="secondary" size="sm" className="text-xs h-7 sm:h-8">
+                            <Plus className="h-3.5 w-3.5" />
+                            <span className="hidden sm:inline ml-1">Add</span>
                           </Button>
                         </Link>
-                      </div>
-                    </div>
+                      </CardFooter>
+                    </Card>
 
-                    {/* Subfunctions */}
-                    {subfuncCount > 0 && !deptCollapsed[department._id] && (
-                      <div
-                        className="flex flex-row gap-4"
-                        style={{
-                          minWidth: subfuncsWidth,
-                          justifyContent: "center",
-                        }}
-                      >
-                        {department.subfunctions.map((sf, idx) => {
-                          // Find team lead and team members for this subfunction
-                          const teamLead = teammembers.find(
-                            (tm) =>
-                              tm.department === department._id &&
-                              tm.subfunctionIndex === idx &&
-                              tm.role === "Team Lead"
-                          );
-                          const teamMembers = teammembers.filter(
-                            (tm) =>
-                              tm.department === department._id &&
-                              tm.subfunctionIndex === idx &&
-                              tm.role === "Team Member"
-                          );
-
-                          // SVG line from department to subfunction
-                          // (vertically centered under department box)
-                          return (
-                            <div
-                              key={idx}
-                              className="flex flex-col items-center"
-                              style={{ minWidth: subfuncBoxWidth }}
-                            >
-                              {/* Line from department to subfunction */}
-                              <svg
-                                width={subfuncBoxWidth}
-                                height="30"
-                                style={{ display: "block" }}
-                              >
-                                <line
-                                  x1={subfuncBoxWidth / 2}
-                                  y1={0}
-                                  x2={subfuncBoxWidth / 2}
-                                  y2={30}
-                                  stroke="#e5e7eb"
-                                  strokeWidth="2"
-                                />
-                              </svg>
-                              {/* Subfunction Box */}
-                              <div
-                                className="bg-white rounded-xl shadow border border-gray-400 px-4 py-2 flex flex-col items-center"
-                                style={{
-                                  minWidth: subfuncBoxWidth,
-                                  maxWidth: subfuncBoxWidth,
-                                }}
-                              >
-                                <div className="text-md font-semibold text-center text-black">
-                                  {sf.name}
-                                </div>
-                              </div>
-                              {/* Line from subfunction to team lead */}
-                              {teamLead && (
-                                <svg
-                                  height="30"
-                                  width={subfuncBoxWidth}
-                                  style={{ display: "block" }}
-                                >
-                                  <line
-                                    x1={subfuncBoxWidth / 2}
-                                    y1={0}
-                                    x2={subfuncBoxWidth / 2}
-                                    y2={30}
-                                    stroke="#e5e7eb"
-                                    strokeWidth="2"
-                                  />
-                                </svg>
-                              )}
-                              {/* Team Lead Box */}
-                              {teamLead && (
-                                <div
-                                  className="bg-gray-100 rounded-lg shadow border border-gray-400 px-4 py-2 flex flex-col items-center"
-                                  style={{
-                                    minWidth: teamLeadBoxWidth,
-                                    maxWidth: teamLeadBoxWidth,
-                                    minHeight: teamLeadBoxHeight,
-                                    marginBottom: teamMembers.length ? 16 : 0,
-                                  }}
-                                >
-                                  <Link href={`/teammembers/${teamLead._id}`}>
-                                    <span className="font-bold text-black hover:underline cursor-pointer">
-                                      {teamLead.name}
-                                    </span>
-                                  </Link>
-                                  <span className="text-xs text-gray-700">
-                                    Team Lead
-                                  </span>
-                                </div>
-                              )}
-                              {/* Lines from team lead to team members */}
-                              {teamLead && teamMembers.length > 0 && (
-                                <svg
-                                  height="30"
-                                  width={
-                                    teamMembers.length * teamMemberBoxWidth +
-                                    (teamMembers.length - 1) * teamMemberBoxGap
-                                  }
-                                  style={{ display: "block" }}
-                                >
-                                  {teamMembers.map((_, i) => {
-                                    const x =
-                                      (teamMemberBoxWidth + teamMemberBoxGap) *
-                                        i +
-                                      teamMemberBoxWidth / 2;
-                                    return (
-                                      <line
-                                        key={i}
-                                        x1={
-                                          (teamMembers.length *
-                                            (teamMemberBoxWidth +
-                                              teamMemberBoxGap) -
-                                            teamMemberBoxGap) /
-                                          2
-                                        }
-                                        y1={0}
-                                        x2={x}
-                                        y2={30}
-                                        stroke="#e5e7eb"
-                                        strokeWidth="2"
-                                      />
-                                    );
-                                  })}
-                                </svg>
-                              )}
-                              {/* Team Members */}
-                              {teamLead && teamMembers.length > 0 && (
-                                <div className="flex flex-row gap-3 mt-0">
-                                  {teamMembers.map((tm) => (
-                                    <div
-                                      key={tm._id}
-                                      className="bg-gray-50 rounded-lg shadow border border-gray-300 px-3 py-2 flex flex-col items-center"
-                                      style={{
-                                        minWidth: teamMemberBoxWidth,
-                                        maxWidth: teamMemberBoxWidth,
-                                        minHeight: teamMemberBoxHeight,
-                                      }}
-                                    >
-                                      <Link href={`/teammembers/${tm._id}`}>
-                                        <span className="text-gray-900 hover:underline cursor-pointer">
-                                          {tm.name}
-                                        </span>
-                                      </Link>
-                                      <span className="text-xs text-gray-700">
-                                        Team Member
-                                      </span>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
+                    {/* Vertical line from department to subfunctions */}
+                    {department.subfunctions?.length > 0 && !deptCollapsed[department._id] && (
+                      <div className="w-0.5 h-8 bg-border/70" />
                     )}
                   </div>
-                );
-              })}
+
+                  {/* Subfunctions */}
+                  {department.subfunctions?.length > 0 && !deptCollapsed[department._id] && (
+                    <div className="flex flex-wrap justify-center gap-4 md:gap-8">
+                      {department.subfunctions.map((subfunction, idx) => {
+                        const teamLead = teammembers.find(
+                          (tm) =>
+                            tm.department === department._id &&
+                            tm.subfunctionIndex === idx &&
+                            tm.role === "Team Lead"
+                        );
+                        const teamMembers = teammembers.filter(
+                          (tm) =>
+                            tm.department === department._id &&
+                            tm.subfunctionIndex === idx &&
+                            tm.role === "Team Member"
+                        );
+
+                        return (
+                          <div key={idx} className="flex flex-col items-center">
+                            {/* Vertical line from department to subfunction */}
+                            <div className="w-0.5 h-5 bg-border/70" />
+
+                            {/* Subfunction Card */}
+                            <Card className="w-56 sm:w-64">
+                              <CardHeader className="py-3 pb-1">
+                                <CardTitle className="text-sm sm:text-base font-medium text-center">
+                                  {subfunction.name}
+                                </CardTitle>
+                              </CardHeader>
+                              <CardFooter className="flex justify-center pt-0 pb-2">
+                                <Link href="/departments">
+                                  <Button variant="secondary" size="sm" className="text-xs h-7 sm:h-8">
+                                    <Plus className="h-3.5 w-3.5" />
+                                    <span className="hidden sm:inline ml-1">Add</span>
+                                  </Button>
+                                </Link>
+                              </CardFooter>
+                            </Card>
+
+                            {/* Vertical line from subfunction to team lead */}
+                            {teamLead && (
+                              <div className="w-0.5 h-8 bg-border/70" />
+                            )}
+
+                            {/* Team Lead */}
+                            {teamLead && (
+                              <div className="flex flex-col items-center">
+                                <Card className="w-56 sm:w-64">
+                                  <CardHeader className="py-3 pb-1">
+                                    <Button
+                                      variant="ghost"
+                                      className="p-0 h-auto w-full flex justify-between items-center mb-1 text-left"
+                                      onClick={() => router.push(`/teammembers/${teamLead._id}`)}
+                                    >
+                                      <div className="flex items-center gap-2">
+                                        <Avatar className="h-7 w-7">
+                                          <AvatarImage src={teamLead.profilePic} />
+                                          <AvatarFallback>{getInitials(teamLead.name)}</AvatarFallback>
+                                        </Avatar>
+                                        <CardTitle className="text-xs sm:text-sm font-medium">
+                                          {teamLead.name}
+                                        </CardTitle>
+                                      </div>
+                                      <User size={14} className="text-muted-foreground" />
+                                    </Button>
+                                  </CardHeader>
+                                  <CardContent className="pt-0 pb-1">
+                                    <p className="text-xs text-muted-foreground">Team Lead</p>
+                                  </CardContent>
+                                </Card>
+
+                                {/* Vertical line from team lead to team members */}
+                                {teamMembers.length > 0 && (
+                                  <div className="w-0.5 h-8 bg-border/70" />
+                                )}
+                              </div>
+                            )}
+
+                            {/* Team Members */}
+                            {teamMembers.length > 0 && (
+                              <div className="flex flex-wrap justify-center gap-3">
+                                {teamMembers.map((member) => (
+                                  <div key={member._id} className="flex flex-col items-center">
+                                    {/* Diagonal line from team lead to member */}
+                                    <div className="w-0.5 h-5 bg-border/70" />
+
+                                    <Card className="w-48 sm:w-56">
+                                      <CardHeader className="py-2 pb-0">
+                                        <Button
+                                          variant="ghost"
+                                          className="p-0 h-auto w-full flex justify-between items-center text-left"
+                                          onClick={() => router.push(`/teammembers/${member._id}`)}
+                                        >
+                                          <div className="flex items-center gap-2">
+                                            <Avatar className="h-6 w-6">
+                                              <AvatarImage src={member.profilePic} />
+                                              <AvatarFallback>{getInitials(member.name)}</AvatarFallback>
+                                            </Avatar>
+                                            <CardTitle className="text-xs font-medium">
+                                              {member.name}
+                                            </CardTitle>
+                                          </div>
+                                          <User size={12} className="text-muted-foreground" />
+                                        </Button>
+                                      </CardHeader>
+                                      <CardContent className="pt-0">
+                                        <p className="text-xs text-muted-foreground">Team Member</p>
+                                      </CardContent>
+                                    </Card>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           )}
         </div>
       ) : (
-        <p className="text-center text-gray-600 max-w-md mx-auto">
-          No organization chart available. Please create a new chart.
-        </p>
+        <div className="w-full flex flex-col items-center py-12">
+          <p className="text-center text-muted-foreground max-w-md mx-auto">
+            No organization chart available. Please create a new chart.
+          </p>
+          <Link href="/organization" className="mt-4">
+            <Button variant="outline" className="flex items-center gap-2">
+              <Plus className="h-4 w-4" />
+              Create New Chart
+            </Button>
+          </Link>
+        </div>
       )}
     </div>
   );
