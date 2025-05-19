@@ -1,14 +1,12 @@
 "use client";
 
-import React from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
-import { useEffect, useState } from "react";
 import Link from "next/link";
 
 export default function TeamMemberPage({ params }) {
-  // Unwrap params using React.use()
-  const { id } = React.use(params);
+  const { id } = params; // Correctly destructure params
 
   const router = useRouter();
   const [teamMember, setTeamMember] = useState(null);
@@ -65,7 +63,7 @@ export default function TeamMemberPage({ params }) {
     );
 
   return (
-    <div className="min-h-screen w-full bg-white text-black px-4 py-10">
+    <div className="min-h-screen w-full bg-white text-black px-4 py-10 max-w-3xl mx-auto">
       {/* Back link pinned to the extreme left */}
       <div className="w-full flex justify-start mb-8">
         <Link
@@ -89,17 +87,17 @@ export default function TeamMemberPage({ params }) {
         </Link>
       </div>
 
-      {/* Main Content centered */}
-      <div className="max-w-2xl mx-auto">
+      {/* Main Content */}
+      <div>
         <h1 className="text-4xl font-extrabold mb-2 tracking-tight">
           {teamMember.name}
         </h1>
         <div className="text-xl font-semibold text-gray-700 mb-6">
           {teamMember.role}
         </div>
-        <div className="space-y-0.5 divide-y divide-gray-200">
+        <div className="space-y-3 divide-y divide-gray-200">
           <InfoRow label="Email" value={teamMember.email} />
-          <InfoRow label="Reports To" value={teamMember.reportTo} />
+          <InfoRow label="Reports To" value={teamMember.reportTo || "-"} />
           <InfoRow
             label="Organization"
             value={teamMember.organization?.name || "N/A"}
